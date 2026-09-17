@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}Admin{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h1 class="h4 mb-3">Admin dashboard</h1>
+  <div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="stat-card p-3"><div class="text-muted">Candidates</div><h3>{{ stats.candidates }}</h3></div></div>
+    <div class="col-md-3"><div class="stat-card p-3"><div class="text-muted">Companies</div><h3>{{ stats.companies }}</h3></div></div>
+    <div class="col-md-3"><div class="stat-card p-3"><div class="text-muted">Jobs</div><h3>{{ stats.jobs }}</h3></div></div>
+    <div class="col-md-3"><div class="stat-card p-3"><div class="text-muted">Applications</div><h3>{{ stats.applications }}</h3></div></div>
+  </div>
+
+  <ul class="nav nav-pills mb-3" role="tablist">
+    <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#t-users">Users</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#t-cos">Companies</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#t-jobs">Jobs</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#t-apps">Applications</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#t-courses">Courses</button></li>
+  </ul>
+
+  <div class="tab-content">
+    <div class="tab-pane fade show active" id="t-users">
+      <div class="panel p-0 overflow-hidden">
+        <table class="table mb-0">
+          <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            {% for u in users %}
+            <tr>
+              <td>{{ u.name }}</td>
+              <td>{{ u.email }}</td>
+              <td>{{ u.role }}</td>
+              <td>{{ "Active" if u.is_active else "Blocked" }}</td>
+              <td>
+                {% if u.role != "admin" %}
+                <form method="post" action="{{ url_for('toggle_user', user_id=u.id) }}">
+                  <button class="btn btn-sm btn-outline-secondary">{{ "Block" if u.is_active else "Unblock" }}</button>
+                </form>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tab-pane fade" id="t-cos">
+      <div class="panel p-0 overflow-hidden">
+        <table class="table mb-0">
+          <thead><tr><th>Company</th><th>Owner</th><th>Approved</th><th></th></tr></thead>
+          <tbody>
+            {% for c in companies %}
+            <tr>
+              <td>{{ c.name }}</td>
+              <td>{{ c.user.email }}</td>
+              <td>{{ "Yes" if c.approved else "No" }}</td>
+              <td>
+                {% if not c.approved %}
+                <form method="post" action="{{ url_for('approve_company', company_id=c.id) }}">
+                  <button class="btn btn-sm btn-success">Approve</button>
+                </form>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tab-pane fade" id="t-jobs">
+      <div class="panel p-0 overflow-hidden">
+        <table class="table mb-0">
+          <thead><tr><th>Title</th><th>Company</th><th>Type</th><th></th></tr></thead>
+          <tbody>
+            {% for job in jobs %}
+            <tr>
+              <td>{{ job.title }}</td>
+              <td>{{ job.company.name }}</td>
+              <td>{{ job.job_type }}</td>
+              <td>
+                <form method="post" action="{{ url_for('admin_delete_job', job_id=job.id) }}">
+                  <button class="btn btn-sm btn-outline-danger">Delete</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tab-pane fade" id="t-apps">
+      <div class="panel p-0 overflow-hidden">
+        <table class="table mb-0">
+          <thead><tr><th>Candidate</th><th>Job</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody>
+            {% for a in applications %}
+            <tr>
+              <td>{{ a.candidate.name }}</td>
+              <td>{{ a.job.title }}</td>
+              <td>{{ a.status }}</td>
+              <td>{{ a.applied_at.strftime("%d %b %Y") }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" class="p-4 text-muted">No applications yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tab-pane fade" id="t-courses">
+      <div class="panel p-0 overflow-hidden">
+        <table class="table mb-0">
+          <thead><tr><th>Course</th><th>Skill</th><th>Company</th></tr></thead>
+          <tbody>
+            {% for course in courses %}
+            <tr>
+              <td>{{ course.title }}</td>
+              <td>{{ course.skill }}</td>
+              <td>{{ course.company.name }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

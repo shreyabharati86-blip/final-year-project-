@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}My profile{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="panel p-4">
+        <h1 class="h4">Candidate profile</h1>
+        <form method="post" enctype="multipart/form-data">
+          <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input class="form-control" name="name" value="{{ current_user.name }}">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Education</label>
+            <input class="form-control" name="education" value="{{ profile.education }}" placeholder="B.Tech CSE">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Skills (comma separated)</label>
+            <input class="form-control" name="skills" value="{{ profile.skills }}" placeholder="HTML, CSS, Python">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Experience</label>
+            <textarea class="form-control" name="experience" rows="4">{{ profile.experience }}</textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Resume (PDF / DOC / DOCX)</label>
+            <input class="form-control" type="file" name="resume" accept=".pdf,.doc,.docx">
+            {% if profile.resume_filename %}
+              <p class="small mt-2 mb-0">Current file:
+                <a href="{{ url_for('uploaded_resume', filename=profile.resume_filename) }}">{{ profile.resume_filename }}</a>
+              </p>
+            {% endif %}
+          </div>
+          <button class="btn btn-navy" type="submit">Save profile</button>
+        </form>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="panel p-4">
+        <h2 class="h6">Applications</h2>
+        <p class="display-6 mb-1">{{ apps|length }}</p>
+        <a href="{{ url_for('my_applications') }}">View applications</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

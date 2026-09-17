@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}My applications{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h1 class="h4 mb-3">My applications</h1>
+  <div class="panel p-0 overflow-hidden">
+    <div class="table-responsive">
+      <table class="table mb-0 align-middle">
+        <thead>
+          <tr>
+            <th>Job</th>
+            <th>Company</th>
+            <th>Type</th>
+            <th>Applied</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for app in applications %}
+          <tr>
+            <td><a href="{{ url_for('job_detail', job_id=app.job.id) }}">{{ app.job.title }}</a></td>
+            <td>{{ app.job.company.name }}</td>
+            <td>{{ app.job.job_type|title }}</td>
+            <td>{{ app.applied_at.strftime("%d %b %Y") }}</td>
+            <td class="status-{{ app.status }}">{{ app.status|title }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" class="p-4 text-muted">You have not applied yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

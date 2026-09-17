@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}{{ job.title }}{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="panel p-4">
+        {% if job.job_type == 'internship' %}
+          <span class="badge badge-intern">Internship</span>
+        {% else %}
+          <span class="badge badge-job">Job</span>
+        {% endif %}
+        <h1 class="h3 mt-2">{{ job.title }}</h1>
+        <p class="text-muted">{{ job.company.name }} · {{ job.location }} · {{ job.salary or "Not disclosed" }}</p>
+        <h2 class="h6">Required skills</h2>
+        <div class="mb-3">
+          {% for skill in required_skills %}
+            <span class="skill-chip">{{ skill }}</span>
+          {% endfor %}
+        </div>
+        <h2 class="h6">Description</h2>
+        <p>{{ job.description }}</p>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="panel p-4 mb-3">
+        {% if current_user and current_user.role == 'candidate' %}
+          {% if existing %}
+            <p class="mb-0">You already applied. Status:
+              <span class="status-{{ existing.status }}">{{ existing.status|title }}</span>
+            </p>
+          {% else %}
+            <form method="post" action="{{ url_for('apply_job', job_id=job.id) }}">
+              <button class="btn btn-apply w-100" type="submit">Apply now</button>
+            </form>
+            <p class="small text-muted mt-2 mb-0">Upload a resume in Profile first.</p>
+          {% endif %}
+        {% elif current_user %}
+          <p class="mb-0 text-muted">Only candidates can apply.</p>
+        {% else %}
+          <a class="btn btn-apply w-100" href="{{ url_for('login') }}">Login to apply</a>
+        {% endif %}
+      </div>
+
+      {% if missing_skills %}
+      <div class="panel p-4">
+        <h2 class="h6">Skill gap</h2>
+        <p class="small">Your profile is missing: <strong>{{ missing_skills|join(", ") }}</strong></p>
+        {% if recommended %}
+          <p class="small mb-2">{{ job.company.name }} offers these courses:</p>
+          <ul class="small mb-0">
+            {% for course in recommended %}
+              <li><strong>{{ course.title }}</strong> ({{ course.skill }})</li>
+            {% endfor %}
+          </ul>
+          <a class="small" href="{{ url_for('courses') }}">See all courses</a>
+        {% else %}
+          <p class="small mb-0">No matching company course yet.</p>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

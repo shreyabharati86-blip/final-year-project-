@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Courses{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h1 class="h4">Skill courses from companies</h1>
+  <p class="text-muted">If a job needs a skill you do not have, take the matching company course.</p>
+  <div class="row g-3">
+    {% for course in courses %}
+    <div class="col-md-6 col-lg-4">
+      <div class="panel p-4 h-100">
+        <span class="skill-chip">{{ course.skill }}</span>
+        <h2 class="h5 mt-2">{{ course.title }}</h2>
+        <p class="text-muted">{{ course.company.name }}</p>
+        <p class="mb-0">{{ course.description }}</p>
+      </div>
+    </div>
+    {% else %}
+    <p class="text-muted">No courses yet.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

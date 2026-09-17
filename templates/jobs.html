@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Vacancies{% endblock %}
+{% block content %}
+<div class="container page-head">
+  <h1 class="h3">Vacancies</h1>
+  <p class="text-muted">Search jobs and internships</p>
+  <form class="row g-2 mb-4" method="get">
+    <div class="col-md-6">
+      <input class="form-control" name="q" value="{{ q }}" placeholder="Skill, title, company, city">
+    </div>
+    <div class="col-md-3">
+      <select class="form-select" name="type">
+        <option value="" {% if not job_type %}selected{% endif %}>All</option>
+        <option value="job" {% if job_type == 'job' %}selected{% endif %}>Jobs</option>
+        <option value="internship" {% if job_type == 'internship' %}selected{% endif %}>Internships</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <button class="btn btn-navy w-100" type="submit">Filter</button>
+    </div>
+  </form>
+  <div class="row g-3">
+    {% for job in jobs %}
+      {% include "partials/job_card.html" %}
+    {% else %}
+      <p class="text-muted">No vacancies match that search.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
