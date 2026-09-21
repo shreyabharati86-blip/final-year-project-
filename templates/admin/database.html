@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}{% if table_data %}{{ table_data.label }} · Database{% else %}Database{% endif %}{% endblock %}
+{% block content %}
+<div class="cc-page">
+  <div class="mb-4">
+    <h1 class="text-3xl font-extrabold tracking-tight text-navy">Database</h1>
+    <p class="mt-1 text-sm text-slate-500">Read-only inspector for CareerConnect records. Use Overview to approve companies, block users, or delete jobs.</p>
+  </div>
+  {% include "admin/_nav.html" %}
+
+  <div class="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    {% for item in overview %}
+      <a class="cc-card p-5 transition hover:border-brand/40 hover:shadow-md {% if table_data and table_data.key == item.key %}ring-2 ring-brand/30{% endif %}" href="{{ url_for('admin_database_table', table_name=item.key) }}">
+        <div class="text-sm text-slate-500">{{ item.label }}</div>
+        <div class="mt-1 text-3xl font-bold text-navy">{{ item.count }}</div>
+        <div class="mt-2 text-xs font-medium text-brand">View records →</div>
+      </a>
+    {% endfor %}
+  </div>
+
+  {% if table_data %}
+    <section class="cc-card overflow-hidden" aria-labelledby="table-heading">
+      <div class="flex flex-col gap-4 border-b border-slate-100 p-5 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h2 id="table-heading" class="text-lg font-bold text-navy">{{ table_data.label }}</h2>
+          <p class="text-xs text-slate-500">{{ table_data.total }} record{{ 's' if table_data.total != 1 else '' }} · page {{ table_data.page }} of {{ table_data.pages }}</p>
+        </div>
+        <form class="flex w-full max-w-md gap-2" method="get" action="{{ url_for('admin_database_table', table_name=table_data.key) }}">
+          <label class="sr-only" for="db-search">Search {{ table_data.label }}</label>
+          <input id="db-search" class="cc-input" type="search" name="q" value="{{ table_data.search }}" placeholder="Search {{ table_data.label|lower }}">
+          <button class="cc-btn-dark shrink-0" type="submit">Search</button>
+        </form>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="cc-table w-full min-w-[640px] text-left text-sm">
+          <thead>
+            <tr>
+              {% for header in table_data.headers %}
+                <th>{{ header }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in table_data.records %}
+              <tr>
+                {% for cell in row %}
+                  <td>{{ cell }}</td>
+                {% endfor %}
+              </tr>
+            {% else %}
+              <tr>
+                <td class="p-6 text-slate-500" colspan="{{ table_data.headers|length }}">
+                  {% if table_data.search %}
+                    No matching records for “{{ table_data.search }}”.
+                  {% else %}
+                    No records in this table yet.
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% if table_data.pages > 1 %}
+        <div class="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 px-5 py-4 text-sm">
+          <span class="text-slate-500">Page {{ table_data.page }} of {{ table_data.pages }}</span>
+          <div class="flex gap-2">
+            {% if table_data.has_prev %}
+              <a class="cc-btn-ghost px-3 py-1.5" href="{{ url_for('admin_database_table', table_name=table_data.key, q=table_data.search, page=table_data.page - 1) }}">Previous</a>
+            {% endif %}
+            {% if table_data.has_next %}
+              <a class="cc-btn-ghost px-3 py-1.5" href="{{ url_for('admin_database_table', table_name=table_data.key, q=table_data.search, page=table_data.page + 1) }}">Next</a>
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+    </section>
+  {% endif %}
+</div>
+{% endblock %}

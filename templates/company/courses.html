@@ -1,38 +1,42 @@
 {% extends "base.html" %}
 {% block title %}Company courses{% endblock %}
 {% block content %}
-<div class="container py-4">
-  <div class="row g-4">
-    <div class="col-lg-5">
-      <div class="panel p-4">
-        <h1 class="h5">Add a skill course</h1>
-        <p class="small text-muted">Use the same skill name as in the job (example: Java).</p>
-        <form method="post">
-          <div class="mb-3">
-            <label class="form-label">Course title</label>
-            <input class="form-control" name="title" required>
+<div class="cc-page">
+  <a class="mb-6 inline-flex text-sm font-semibold text-slate-500 hover:text-brand" href="{{ url_for('company_dashboard') }}">← Back to dashboard</a>
+  <div class="grid gap-6 lg:grid-cols-12">
+    <div class="lg:col-span-5">
+      <div class="cc-card p-6">
+        <h1 class="text-xl font-bold text-navy">Add a skill course</h1>
+        <p class="mt-1 mb-5 text-sm text-slate-500">Use the same skill name as in the job, for example Java or Flask.</p>
+        <form class="space-y-4" method="post">
+          <div>
+            <label class="cc-label" for="title">Course title</label>
+            <input id="title" class="cc-input" name="title" required>
           </div>
-          <div class="mb-3">
-            <label class="form-label">Skill taught</label>
-            <input class="form-control" name="skill" required>
+          <div>
+            <label class="cc-label" for="skill">Skill taught</label>
+            <input id="skill" class="cc-input" name="skill" required>
           </div>
-          <div class="mb-3">
-            <label class="form-label">Description</label>
-            <textarea class="form-control" name="description" rows="3"></textarea>
+          <div>
+            <label class="cc-label" for="description">Description</label>
+            <textarea id="description" class="cc-input" name="description" rows="3"></textarea>
           </div>
-          <button class="btn btn-navy" type="submit">Save course</button>
+          <button class="cc-btn-dark" type="submit">Save course</button>
         </form>
       </div>
     </div>
-    <div class="col-lg-7">
+    <div class="space-y-3 lg:col-span-7">
       {% for course in courses %}
-        <div class="panel p-3 mb-3">
-          <span class="skill-chip">{{ course.skill }}</span>
-          <h2 class="h6 mt-2 mb-1">{{ course.title }}</h2>
-          <p class="mb-0 small">{{ course.description }}</p>
-        </div>
+        <article class="cc-card p-5">
+          <span class="cc-chip">{{ course.skill }}</span>
+          <h2 class="mt-2 font-bold text-navy">{{ course.title }}</h2>
+          <p class="mt-1 text-sm text-slate-500">{{ course.description }}</p>
+        </article>
       {% else %}
-        <p class="text-muted">No courses yet.</p>
+        <div class="cc-card px-6 py-12 text-center">
+          <p class="font-semibold text-navy">No courses yet</p>
+          <p class="mt-1 text-sm text-slate-500">Add a course so candidates with a skill gap can find it on the job page.</p>
+        </div>
       {% endfor %}
     </div>
   </div>

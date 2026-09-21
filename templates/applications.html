@@ -1,11 +1,18 @@
 {% extends "base.html" %}
 {% block title %}My applications{% endblock %}
 {% block content %}
-<div class="container py-4">
-  <h1 class="h4 mb-3">My applications</h1>
-  <div class="panel p-0 overflow-hidden">
-    <div class="table-responsive">
-      <table class="table mb-0 align-middle">
+<div class="cc-page">
+  <div class="mb-6 flex flex-col justify-between gap-3 md:flex-row md:items-end">
+    <div>
+      <h1 class="text-3xl font-extrabold tracking-tight text-navy">My applications</h1>
+      <p class="mt-1 text-sm text-slate-500">Track every role you have applied to.</p>
+    </div>
+    <a class="cc-btn-ghost" href="{{ url_for('jobs') }}">Browse jobs</a>
+  </div>
+  {% if applications %}
+  <div class="cc-card overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="cc-table w-full text-left text-sm">
         <thead>
           <tr>
             <th>Job</th>
@@ -18,18 +25,31 @@
         <tbody>
           {% for app in applications %}
           <tr>
-            <td><a href="{{ url_for('job_detail', job_id=app.job.id) }}">{{ app.job.title }}</a></td>
-            <td>{{ app.job.company.name }}</td>
+            <td><a class="font-semibold text-navy hover:text-brand" href="{{ url_for('job_detail', job_id=app.job.id) }}">{{ app.job.title }}</a></td>
+            <td class="text-slate-600">{{ app.job.company.name }}</td>
             <td>{{ app.job.job_type|title }}</td>
-            <td>{{ app.applied_at.strftime("%d %b %Y") }}</td>
-            <td class="status-{{ app.status }}">{{ app.status|title }}</td>
+            <td class="text-slate-500">{{ app.applied_at.strftime("%d %b %Y") }}</td>
+            <td>
+              {% if app.status == 'accepted' %}
+                <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">Accepted</span>
+              {% elif app.status == 'rejected' %}
+                <span class="rounded-full bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-700">Rejected</span>
+              {% else %}
+                <span class="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">Pending</span>
+              {% endif %}
+            </td>
           </tr>
-          {% else %}
-          <tr><td colspan="5" class="p-4 text-muted">You have not applied yet.</td></tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
   </div>
+  {% else %}
+  <div class="cc-card px-6 py-14 text-center">
+    <p class="text-lg font-bold text-navy">You have not applied yet</p>
+    <p class="mt-2 text-sm text-slate-500">Upload a resume, then apply from any job page in one click.</p>
+    <a class="cc-btn-primary mt-5" href="{{ url_for('jobs') }}">Find a role</a>
+  </div>
+  {% endif %}
 </div>
 {% endblock %}

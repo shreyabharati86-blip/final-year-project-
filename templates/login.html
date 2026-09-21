@@ -1,28 +1,41 @@
 {% extends "base.html" %}
 {% block title %}Login{% endblock %}
 {% block content %}
-<div class="mx-auto max-w-md px-4 py-10">
-  <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-    <h1 class="text-2xl font-bold text-navy">Login</h1>
-    <p class="mb-6 mt-1 text-sm text-slate-500">Use your CareerConnect account</p>
+<div class="cc-page grid items-center gap-10 md:grid-cols-2">
+  <div class="hidden md:block">
+    <p class="mb-3 text-sm font-semibold text-brand">Welcome back</p>
+    <h1 class="text-3xl font-extrabold tracking-tight text-navy">Sign in to apply or hire on CareerConnect.</h1>
+    <p class="mt-4 max-w-md text-sm leading-6 text-slate-500">Use the demo accounts below if you are evaluating the project, or log in with the account you registered.</p>
+    <ul class="mt-6 space-y-3 text-sm text-slate-600">
+      <li class="flex gap-2"><span class="text-brand">•</span> Candidates can keep a resume and track applications</li>
+      <li class="flex gap-2"><span class="text-brand">•</span> Companies review applicants after admin approval</li>
+    </ul>
+  </div>
+  <div class="cc-card p-6 md:p-8">
+    <h1 class="text-2xl font-bold text-navy md:hidden">Login</h1>
+    <p class="mb-6 text-sm text-slate-500 md:hidden">Candidate and company accounts</p>
+    <h2 class="hidden text-2xl font-bold text-navy md:block">Login</h2>
+    <p class="mb-6 mt-1 hidden text-sm text-slate-500 md:block">Candidate and company accounts</p>
     <form class="space-y-4" method="post">
       <div>
-        <label class="mb-1 block text-sm font-medium">Email</label>
-        <input class="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-blue-100" type="email" name="email" required>
+        <label class="cc-label" for="email">Email</label>
+        <input id="email" class="cc-input" type="email" name="email" value="{{ request.form.get('email', '') }}" autocomplete="email" required>
       </div>
       <div>
-        <label class="mb-1 block text-sm font-medium">Password</label>
-        <input class="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-blue-100" type="password" name="password" required>
+        <div class="mb-1.5 flex items-center justify-between">
+          <label class="text-sm font-medium text-slate-700" for="password">Password</label>
+          <button class="text-xs font-semibold text-brand" type="button" data-password-toggle="password">Show</button>
+        </div>
+        <input id="password" class="cc-input" type="password" name="password" autocomplete="current-password" required>
       </div>
-      <button class="w-full rounded-lg bg-navy py-2.5 text-sm font-semibold text-white hover:bg-slate-800" type="submit">Login</button>
+      <button class="cc-btn-dark w-full" type="submit">Login</button>
     </form>
-    <p class="mt-5 text-xs leading-6 text-slate-500">
-      Demo accounts:<br>
-      Candidate <code class="rounded bg-slate-100 px-1">rahul@gmail.com</code> / <code class="rounded bg-slate-100 px-1">user123</code><br>
-      Company <code class="rounded bg-slate-100 px-1">hr@technova.com</code> / <code class="rounded bg-slate-100 px-1">company123</code><br>
-      Admin <code class="rounded bg-slate-100 px-1">admin@careerconnect.com</code> / <code class="rounded bg-slate-100 px-1">admin123</code>
-    </p>
-    <p class="mt-4 text-sm">New here? <a class="font-semibold text-brand hover:underline" href="{{ url_for('register') }}">Register</a></p>
+    <div class="mt-5 rounded-xl bg-slate-50 p-3 text-xs leading-6 text-slate-500">
+      <p class="font-semibold text-slate-700">Demo accounts</p>
+      Candidate <code class="rounded bg-white px-1">rahul@gmail.com</code> / <code class="rounded bg-white px-1">user123</code><br>
+      Company <code class="rounded bg-white px-1">hr@technova.com</code> / <code class="rounded bg-white px-1">company123</code>
+    </div>
+    <p class="mt-4 text-sm">New here? <a class="font-semibold text-brand hover:underline" href="{{ url_for('register') }}">Create an account</a></p>
   </div>
 </div>
 {% endblock %}

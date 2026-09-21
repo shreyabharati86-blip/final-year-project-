@@ -1,44 +1,69 @@
 {% extends "base.html" %}
 {% block title %}Company dashboard{% endblock %}
 {% block content %}
-<div class="container py-4">
-  <div class="d-flex justify-content-between align-items-center mb-3">
+<div class="cc-page">
+  <div class="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
     <div>
-      <h1 class="h4 mb-1">{{ company.name }}</h1>
+      <h1 class="text-3xl font-extrabold tracking-tight text-navy">{{ company.name }}</h1>
       {% if company.approved %}
-        <span class="badge text-bg-success">Approved</span>
+        <span class="mt-2 inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">Approved to hire</span>
       {% else %}
-        <span class="badge text-bg-warning">Waiting for admin approval</span>
+        <span class="mt-2 inline-flex rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">Waiting for admin approval</span>
       {% endif %}
     </div>
-    <div class="d-flex gap-2">
-      <a class="btn btn-outline-primary" href="{{ url_for('company_courses') }}">Courses</a>
-      <a class="btn btn-navy" href="{{ url_for('post_job') }}">Post vacancy</a>
+    <div class="flex flex-wrap gap-2">
+      <a class="cc-btn-ghost" href="{{ url_for('company_courses') }}">Courses</a>
+      <a class="cc-btn-dark" href="{{ url_for('post_job') }}">Post vacancy</a>
     </div>
   </div>
-  <div class="row g-3 mb-4">
-    <div class="col-md-4"><div class="stat-card p-4"><div class="text-muted">Jobs posted</div><h3>{{ jobs|length }}</h3></div></div>
-    <div class="col-md-4"><div class="stat-card p-4"><div class="text-muted">Applications</div><h3>{{ app_count }}</h3></div></div>
-    <div class="col-md-4"><div class="stat-card p-4"><div class="text-muted">Pending review</div><h3>{{ pending }}</h3></div></div>
+  {% if not company.approved %}
+  <div class="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+    Your company is visible to admin, but you cannot post jobs or courses until it is approved.
   </div>
-  <div class="panel p-0 overflow-hidden">
-    <table class="table mb-0 align-middle">
-      <thead><tr><th>Title</th><th>Type</th><th>Location</th><th>Applicants</th></tr></thead>
-      <tbody>
-        {% for job in jobs %}
-        <tr>
-          <td>{{ job.title }}</td>
-          <td>{{ job.job_type|title }}</td>
-          <td>{{ job.location }}</td>
-          <td>
-            <a href="{{ url_for('company_applicants', job_id=job.id) }}">{{ job.applications|length }} view</a>
-          </td>
-        </tr>
-        {% else %}
-        <tr><td colspan="4" class="p-4 text-muted">No vacancies yet.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  {% endif %}
+  <div class="mb-6 grid gap-4 md:grid-cols-3">
+    <div class="cc-card p-5">
+      <div class="text-sm text-slate-500">Jobs posted</div>
+      <div class="mt-1 text-3xl font-bold text-navy">{{ jobs|length }}</div>
+    </div>
+    <div class="cc-card p-5">
+      <div class="text-sm text-slate-500">Applications</div>
+      <div class="mt-1 text-3xl font-bold text-navy">{{ app_count }}</div>
+    </div>
+    <div class="cc-card p-5">
+      <div class="text-sm text-slate-500">Pending review</div>
+      <div class="mt-1 text-3xl font-bold text-navy">{{ pending }}</div>
+    </div>
+  </div>
+  <div class="cc-card overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="cc-table w-full text-left text-sm">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Type</th>
+            <th>Location</th>
+            <th>Applicants</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for job in jobs %}
+          <tr>
+            <td class="font-semibold text-navy">{{ job.title }}</td>
+            <td>{{ job.job_type|title }}</td>
+            <td>{{ job.location }}</td>
+            <td>
+              <a class="font-semibold text-brand hover:underline" href="{{ url_for('company_applicants', job_id=job.id) }}">{{ job.applications|length }} view</a>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="4" class="p-8 text-center text-slate-500">No vacancies yet. Post your first opening after approval.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 {% endblock %}
