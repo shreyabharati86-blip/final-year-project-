@@ -1,40 +1,42 @@
 {% extends "base.html" %}
 {% block title %}Post vacancy{% endblock %}
 {% block content %}
-<div class="container py-4">
-  <div class="panel p-4" style="max-width:720px">
-    <h1 class="h4">Post a job or internship</h1>
-    <form method="post">
-      <div class="mb-3">
-        <label class="form-label">Title</label>
-        <input class="form-control" name="title" required>
+<div class="cc-page">
+  <a class="mb-6 inline-flex text-sm font-semibold text-slate-500 hover:text-brand" href="{{ url_for('company_dashboard') }}">← Back to dashboard</a>
+  <div class="cc-card mx-auto max-w-2xl p-6 md:p-8">
+    <h1 class="text-2xl font-bold text-navy">Post a job or internship</h1>
+    <p class="mt-1 mb-6 text-sm text-slate-500">Use comma-separated skills so candidates can be matched and shown courses.</p>
+    <form class="space-y-4" method="post">
+      <div>
+        <label class="cc-label" for="title">Title</label>
+        <input id="title" class="cc-input" name="title" value="{{ request.form.get('title', '') }}" required>
       </div>
-      <div class="row">
-        <div class="col-md-6 mb-3">
-          <label class="form-label">Type</label>
-          <select class="form-select" name="job_type">
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label class="cc-label" for="job_type">Type</label>
+          <select id="job_type" class="cc-input" name="job_type">
             <option value="job">Job</option>
             <option value="internship">Internship</option>
           </select>
         </div>
-        <div class="col-md-6 mb-3">
-          <label class="form-label">Location</label>
-          <input class="form-control" name="location" placeholder="Bengaluru / Remote">
+        <div>
+          <label class="cc-label" for="location">Location</label>
+          <input id="location" class="cc-input" name="location" placeholder="Bengaluru / Remote">
         </div>
       </div>
-      <div class="mb-3">
-        <label class="form-label">Salary / stipend</label>
-        <input class="form-control" name="salary">
+      <div>
+        <label class="cc-label" for="salary">Salary / stipend</label>
+        <input id="salary" class="cc-input" name="salary" placeholder="4–6 LPA or Stipend 15k/month">
       </div>
-      <div class="mb-3">
-        <label class="form-label">Required skills (comma separated)</label>
-        <input class="form-control" name="required_skills" placeholder="Python, Flask, SQL">
+      <div>
+        <label class="cc-label" for="required_skills">Required skills</label>
+        <input id="required_skills" class="cc-input" name="required_skills" placeholder="Python, Flask, SQL">
       </div>
-      <div class="mb-3">
-        <label class="form-label">Description</label>
-        <textarea class="form-control" name="description" rows="5"></textarea>
+      <div>
+        <label class="cc-label" for="description">Description</label>
+        <textarea id="description" class="cc-input min-h-[140px]" name="description" rows="5"></textarea>
       </div>
-      <button class="btn btn-navy" type="submit">Publish</button>
+      <button class="cc-btn-dark" type="submit">Publish vacancy</button>
     </form>
   </div>
 </div>

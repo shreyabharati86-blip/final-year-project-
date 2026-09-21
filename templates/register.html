@@ -1,43 +1,63 @@
 {% extends "base.html" %}
 {% block title %}Register{% endblock %}
 {% block content %}
-<div class="container">
-  <div class="auth-wrap panel p-4 p-md-5">
-    <h1 class="h3 mb-1">Create account</h1>
-    <p class="text-muted mb-4">Join as a candidate or a company</p>
-    <form method="post">
-      <div class="mb-3">
-        <label class="form-label">Full name</label>
-        <input class="form-control" name="name" required>
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Email</label>
-        <input class="form-control" type="email" name="email" required>
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Password</label>
-        <input class="form-control" type="password" name="password" minlength="6" required>
-      </div>
-      <div class="mb-3">
-        <label class="form-label">I am a</label>
-        <select class="form-select" name="role" id="role">
-          <option value="candidate">Candidate</option>
-          <option value="company">Company</option>
-        </select>
-      </div>
-      <div id="company-fields" class="d-none">
-        <div class="mb-3">
-          <label class="form-label">Company name</label>
-          <input class="form-control" name="company_name">
+<div class="cc-page">
+  <div class="mx-auto max-w-xl">
+    <div class="mb-6 text-center">
+      <h1 class="text-3xl font-extrabold tracking-tight text-navy">Create your account</h1>
+      <p class="mt-2 text-sm text-slate-500">Join as a candidate looking for work, or as a company ready to hire.</p>
+    </div>
+    <div class="cc-card p-6 md:p-8">
+      <form class="space-y-4" method="post">
+        <div>
+          <label class="cc-label" for="name">Full name</label>
+          <input id="name" class="cc-input" name="name" value="{{ request.form.get('name', '') }}" autocomplete="name" required>
         </div>
-        <div class="mb-3">
-          <label class="form-label">Industry</label>
-          <input class="form-control" name="industry" placeholder="IT, Finance, ...">
+        <div>
+          <label class="cc-label" for="email">Email</label>
+          <input id="email" class="cc-input" type="email" name="email" value="{{ request.form.get('email', '') }}" autocomplete="email" required>
         </div>
-      </div>
-      <button class="btn btn-navy w-100" type="submit">Register</button>
-    </form>
-    <p class="mt-3 mb-0">Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
+        <div>
+          <div class="mb-1.5 flex items-center justify-between">
+            <label class="text-sm font-medium text-slate-700" for="password">Password</label>
+            <button class="text-xs font-semibold text-brand" type="button" data-password-toggle="password">Show</button>
+          </div>
+          <input id="password" class="cc-input" type="password" name="password" minlength="6" autocomplete="new-password" required>
+          <p class="mt-1 text-xs text-slate-400">At least 6 characters.</p>
+        </div>
+        <fieldset>
+          <legend class="cc-label">I am a</legend>
+          <div class="grid gap-3 sm:grid-cols-2">
+            <div class="role-card">
+              <input class="sr-only" type="radio" name="role" id="role-candidate" value="candidate" {% if request.form.get('role', 'candidate') != 'company' %}checked{% endif %}>
+              <label class="block cursor-pointer rounded-2xl border border-slate-200 p-4" for="role-candidate">
+                <span class="block font-semibold text-navy">Candidate</span>
+                <span class="mt-1 block text-xs leading-5 text-slate-500">Build a profile, upload a resume, and apply to jobs.</span>
+              </label>
+            </div>
+            <div class="role-card">
+              <input class="sr-only" type="radio" name="role" id="role-company" value="company" {% if request.form.get('role') == 'company' %}checked{% endif %}>
+              <label class="block cursor-pointer rounded-2xl border border-slate-200 p-4" for="role-company">
+                <span class="block font-semibold text-navy">Company</span>
+                <span class="mt-1 block text-xs leading-5 text-slate-500">Post vacancies after an admin approves your company.</span>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+        <div id="company-fields" class="hidden space-y-4 rounded-2xl bg-slate-50 p-4">
+          <div>
+            <label class="cc-label" for="company_name">Company name</label>
+            <input id="company_name" class="cc-input" name="company_name" value="{{ request.form.get('company_name', '') }}">
+          </div>
+          <div>
+            <label class="cc-label" for="industry">Industry</label>
+            <input id="industry" class="cc-input" name="industry" value="{{ request.form.get('industry', '') }}" placeholder="IT, Finance, Education...">
+          </div>
+        </div>
+        <button class="cc-btn-dark w-full" type="submit">Create account</button>
+      </form>
+      <p class="mt-4 text-sm">Already have an account? <a class="font-semibold text-brand hover:underline" href="{{ url_for('login') }}">Login</a></p>
+    </div>
   </div>
 </div>
 {% endblock %}

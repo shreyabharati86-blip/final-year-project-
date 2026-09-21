@@ -55,6 +55,16 @@ def inject_globals():
     return {"current_user": get_current_user()}
 
 
+def destination_for_user(user):
+    if not user:
+        return url_for("index")
+    if user.role == "admin":
+        return url_for("admin_dashboard")
+    if user.role == "company":
+        return url_for("company_dashboard")
+    return url_for("profile")
+
+
 def login_required(view):
     @wraps(view)
     def wrapped(*args, **kwargs):
@@ -73,10 +83,12 @@ def role_required(*roles):
             user = get_current_user()
             if not user:
                 flash("Please login first.", "warning")
+                if roles == ("admin",):
+                    return redirect(url_for("admin_login"))
                 return redirect(url_for("login"))
             if user.role not in roles:
                 flash("You do not have access to that page.", "danger")
-                return redirect(url_for("index"))
+                return redirect(destination_for_user(user))
             return view(*args, **kwargs)
 
         return wrapped
@@ -141,8 +153,9 @@ def register():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    if get_current_user():
-        return redirect(url_for("index"))
+    current = get_current_user()
+    if current:
+        return redirect(destination_for_user(current))
     if request.method == "POST":
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
@@ -150,13 +163,14 @@ def login():
         if not user or not check_password_hash(user.password_hash, password):
             flash("Invalid email or password.", "danger")
             return render_template("login.html")
+        if user.role == "admin":
+            flash("Administrator accounts must sign in through the admin portal.", "warning")
+            return render_template("login.html")
         if not user.is_active:
             flash("This account is blocked. Contact admin.", "danger")
             return render_template("login.html")
         session["user_id"] = user.id
         flash("Welcome back, %s." % user.name, "success")
-        if user.role == "admin":
-            return redirect(url_for("admin_dashboard"))
         if user.role == "company":
             return redirect(url_for("company_dashboard"))
         return redirect(url_for("profile"))
@@ -394,7 +408,34 @@ def company_courses():
     return render_template("company/courses.html", courses=items)
 
 
-@app.route("/admin")
+@app.route("/admin", methods=["GET", "POST"])
+def admin_login():
+    current = get_current_user()
+    if current:
+        if current.role == "admin":
+            return redirect(url_for("admin_dashboard"))
+        flash("The administration portal is for administrators only.", "danger")
+        return redirect(destination_for_user(current))
+    if request.method == "POST":
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "")
+        user = db.get_user_by_email(email)
+        if not user or not check_password_hash(user.password_hash, password):
+            flash("Invalid admin email or password.", "danger")
+            return render_template("admin/login.html")
+        if user.role != "admin":
+            flash("Access denied. This portal is for administrators only.", "danger")
+            return render_template("admin/login.html")
+        if not user.is_active:
+            flash("This administrator account is blocked.", "danger")
+            return render_template("admin/login.html")
+        session["user_id"] = user.id
+        flash("Welcome back, %s." % user.name, "success")
+        return redirect(url_for("admin_dashboard"))
+    return render_template("admin/login.html")
+
+
+@app.route("/admin/dashboard")
 @role_required("admin")
 def admin_dashboard():
     return render_template(
@@ -410,6 +451,50 @@ def admin_dashboard():
             "jobs": db.count_jobs(),
             "applications": db.count_applications(),
         },
+    )
+
+
+@app.route("/admin/analytics")
+@role_required("admin")
+def admin_analytics():
+    company_id = request.args.get("company_id", type=int)
+    job_type = request.args.get("job_type", "").strip()
+    date_from = request.args.get("date_from", "").strip()
+    date_to = request.args.get("date_to", "").strip()
+    analytics = db.get_admin_analytics(
+        company_id=company_id,
+        job_type=job_type,
+        date_from=date_from,
+        date_to=date_to,
+    )
+    return render_template("admin/analytics.html", analytics=analytics)
+
+
+@app.route("/admin/database")
+@role_required("admin")
+def admin_database():
+    return render_template(
+        "admin/database.html",
+        overview=db.get_database_overview(),
+        table_data=None,
+    )
+
+
+@app.route("/admin/database/<table_name>")
+@role_required("admin")
+def admin_database_table(table_name):
+    table_name = (table_name or "").strip().lower()
+    result = db.inspect_table(
+        table_name,
+        search=request.args.get("q", ""),
+        page=request.args.get("page", 1, type=int) or 1,
+    )
+    if result is None:
+        abort(404)
+    return render_template(
+        "admin/database.html",
+        overview=db.get_database_overview(),
+        table_data=result,
     )
 
 

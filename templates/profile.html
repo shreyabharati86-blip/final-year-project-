@@ -1,48 +1,67 @@
 {% extends "base.html" %}
 {% block title %}My profile{% endblock %}
 {% block content %}
-<div class="container py-4">
-  <div class="row g-4">
-    <div class="col-lg-8">
-      <div class="panel p-4">
-        <h1 class="h4">Candidate profile</h1>
-        <form method="post" enctype="multipart/form-data">
-          <div class="mb-3">
-            <label class="form-label">Name</label>
-            <input class="form-control" name="name" value="{{ current_user.name }}">
+{% set checks = [profile.education, profile.skills, profile.experience, profile.resume_filename] %}
+{% set done = checks|select|list|length %}
+{% set pct = (done / 4 * 100)|int %}
+<div class="cc-page">
+  <div class="mb-6">
+    <h1 class="text-3xl font-extrabold tracking-tight text-navy">Candidate profile</h1>
+    <p class="mt-1 text-sm text-slate-500">Keep this up to date so companies can review you quickly.</p>
+  </div>
+  <div class="grid gap-6 lg:grid-cols-12">
+    <div class="lg:col-span-8">
+      <div class="cc-card p-6 md:p-8">
+        <form class="space-y-4" method="post" enctype="multipart/form-data">
+          <div>
+            <label class="cc-label" for="name">Name</label>
+            <input id="name" class="cc-input" name="name" value="{{ current_user.name }}">
           </div>
-          <div class="mb-3">
-            <label class="form-label">Education</label>
-            <input class="form-control" name="education" value="{{ profile.education }}" placeholder="B.Tech CSE">
+          <div>
+            <label class="cc-label" for="education">Education</label>
+            <input id="education" class="cc-input" name="education" value="{{ profile.education }}" placeholder="B.Tech CSE">
           </div>
-          <div class="mb-3">
-            <label class="form-label">Skills (comma separated)</label>
-            <input class="form-control" name="skills" value="{{ profile.skills }}" placeholder="HTML, CSS, Python">
+          <div>
+            <label class="cc-label" for="skills">Skills</label>
+            <input id="skills" class="cc-input" name="skills" value="{{ profile.skills }}" placeholder="HTML, CSS, Python">
+            <p class="mt-1 text-xs text-slate-400">Comma-separated. These are matched against job requirements.</p>
           </div>
-          <div class="mb-3">
-            <label class="form-label">Experience</label>
-            <textarea class="form-control" name="experience" rows="4">{{ profile.experience }}</textarea>
+          <div>
+            <label class="cc-label" for="experience">Experience</label>
+            <textarea id="experience" class="cc-input min-h-[120px]" name="experience" rows="4">{{ profile.experience }}</textarea>
           </div>
-          <div class="mb-3">
-            <label class="form-label">Resume (PDF / DOC / DOCX)</label>
-            <input class="form-control" type="file" name="resume" accept=".pdf,.doc,.docx">
-            {% if profile.resume_filename %}
-              <p class="small mt-2 mb-0">Current file:
-                <a href="{{ url_for('uploaded_resume', filename=profile.resume_filename) }}">{{ profile.resume_filename }}</a>
-              </p>
-            {% endif %}
+          <div>
+            <label class="cc-label" for="resume">Resume (PDF / DOC / DOCX)</label>
+            <div class="dropzone rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4">
+              <input id="resume" class="w-full text-sm" type="file" name="resume" accept=".pdf,.doc,.docx">
+              {% if profile.resume_filename %}
+                <p class="mt-3 text-sm text-slate-600">Current file:
+                  <a class="font-semibold text-brand hover:underline" href="{{ url_for('uploaded_resume', filename=profile.resume_filename) }}">{{ profile.resume_filename }}</a>
+                </p>
+              {% else %}
+                <p class="mt-2 text-xs text-slate-400">Upload a resume before applying to jobs.</p>
+              {% endif %}
+            </div>
           </div>
-          <button class="btn btn-navy" type="submit">Save profile</button>
+          <button class="cc-btn-dark" type="submit">Save profile</button>
         </form>
       </div>
     </div>
-    <div class="col-lg-4">
-      <div class="panel p-4">
-        <h2 class="h6">Applications</h2>
-        <p class="display-6 mb-1">{{ apps|length }}</p>
-        <a href="{{ url_for('my_applications') }}">View applications</a>
+    <aside class="space-y-4 lg:col-span-4">
+      <div class="cc-card p-5">
+        <h2 class="text-sm font-bold text-navy">Profile completeness</h2>
+        <p class="mt-2 text-3xl font-bold text-navy">{{ pct }}%</p>
+        <div class="mt-3 h-2 overflow-hidden rounded-full bg-slate-100">
+          <div class="h-full rounded-full bg-brand" style="width: {{ pct }}%"></div>
+        </div>
+        <p class="mt-3 text-xs text-slate-500">{{ done }} of 4 sections filled: education, skills, experience, resume.</p>
       </div>
-    </div>
+      <div class="cc-card p-5">
+        <h2 class="text-sm font-bold text-navy">Applications</h2>
+        <p class="mt-2 text-3xl font-bold text-navy">{{ apps|length }}</p>
+        <a class="mt-3 inline-block text-sm font-semibold text-brand hover:underline" href="{{ url_for('my_applications') }}">View applications</a>
+      </div>
+    </aside>
   </div>
 </div>
 {% endblock %}

@@ -1,0 +1,6 @@
+{% set ep = request.endpoint %}
+<nav class="mb-6 flex flex-wrap gap-2" aria-label="Admin sections">
+  <a class="admin-subnav-link {% if ep == 'admin_dashboard' %}is-active{% endif %}" href="{{ url_for('admin_dashboard') }}">Overview</a>
+  <a class="admin-subnav-link {% if ep == 'admin_analytics' %}is-active{% endif %}" href="{{ url_for('admin_analytics') }}">Analytics</a>
+  <a class="admin-subnav-link {% if ep in ['admin_database', 'admin_database_table'] %}is-active{% endif %}" href="{{ url_for('admin_database') }}">Database</a>
+</nav>

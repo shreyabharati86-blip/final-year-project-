@@ -1,52 +1,101 @@
 {% extends "base.html" %}
 {% block title %}Find jobs & internships{% endblock %}
 {% block content %}
-<section class="bg-gradient-to-br from-slate-950 via-slate-900 to-blue-700 text-white">
-  <div class="mx-auto max-w-6xl px-4 py-16 md:py-20">
-    <p class="mb-2 text-sm text-blue-100">Job portal for students and companies</p>
-    <h1 class="mb-4 text-3xl font-extrabold tracking-tight md:text-5xl">Find a job. Post a vacancy.<br>Grow the missing skill.</h1>
-    <p class="mb-8 max-w-2xl text-slate-200">Candidates apply with a resume. Companies hire. If a skill is missing, the company can offer a course.</p>
-    <form class="grid gap-2 rounded-2xl bg-white p-3 shadow-xl shadow-slate-950/20 md:grid-cols-12" action="{{ url_for('jobs') }}" method="get">
-      <input class="rounded-xl border-0 px-4 py-3 text-slate-800 outline-none ring-slate-200 focus:ring-2 md:col-span-7" name="q" placeholder="Skill, title, company, or city">
-      <select class="rounded-xl border border-slate-200 px-3 py-3 text-slate-800 md:col-span-3" name="type">
+<section class="hero-mesh relative overflow-hidden text-white">
+  <div class="hero-grid pointer-events-none absolute inset-0 z-0"></div>
+  <div class="relative z-10 mx-auto grid max-w-6xl items-center gap-12 px-4 py-16 md:grid-cols-2 md:py-24">
+    <div>
+      <p class="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-semibold text-blue-100">Student-first job portal</p>
+      <h1 class="mb-4 text-4xl font-extrabold tracking-tight text-white md:text-5xl">Find work. Hire talent.<br><span class="text-blue-300">Close the skill gap.</span></h1>
+      <p class="mb-8 max-w-xl text-base leading-7 text-slate-300">Candidates apply with a resume. Companies post jobs after admin approval. If a required skill is missing, the company can offer a course that shows up on the job page.</p>
+      <div class="flex flex-wrap gap-3">
+        <a class="cc-btn-accent" href="{{ url_for('jobs') }}">Browse openings</a>
+        {% if not current_user %}
+          <a class="cc-btn border border-white/20 bg-white/10 text-white hover:bg-white/15" href="{{ url_for('register') }}">Create free account</a>
+        {% elif current_user.role == 'company' %}
+          <a class="cc-btn border border-white/20 bg-white/10 text-white hover:bg-white/15" href="{{ url_for('post_job') }}">Post a vacancy</a>
+        {% elif current_user.role == 'candidate' %}
+          <a class="cc-btn border border-white/20 bg-white/10 text-white hover:bg-white/15" href="{{ url_for('profile') }}">Complete profile</a>
+        {% endif %}
+      </div>
+    </div>
+    <form class="rounded-3xl border border-slate-200 bg-white p-4 text-slate-800 shadow-2xl shadow-slate-950/40 md:p-5" action="{{ url_for('jobs') }}" method="get">
+      <p class="mb-3 text-sm font-semibold text-navy">Search openings</p>
+      <label class="cc-label" for="q">Keyword</label>
+      <input id="q" class="cc-input mb-3" name="q" placeholder="Skill, title, company, or city" autocomplete="off">
+      <label class="cc-label" for="type">Type</label>
+      <select id="type" class="cc-input mb-4" name="type">
         <option value="">All openings</option>
         <option value="job">Jobs</option>
         <option value="internship">Internships</option>
       </select>
-      <button class="rounded-xl bg-navy px-4 py-3 font-semibold text-white hover:bg-slate-800 md:col-span-2" type="submit">Search</button>
+      <button class="cc-btn-dark w-full" type="submit">Search vacancies</button>
+      <p class="mt-3 text-xs text-slate-500">Try “Python”, “Remote”, or “Frontend Intern”.</p>
     </form>
   </div>
 </section>
 
-<div class="mx-auto -mt-7 grid max-w-6xl gap-4 px-4 md:grid-cols-3">
-  <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+<div class="relative z-10 mx-auto -mt-8 grid max-w-6xl gap-4 px-4 md:grid-cols-3">
+  <div class="cc-card p-5">
     <div class="text-sm text-slate-500">Open vacancies</div>
     <div class="mt-1 text-3xl font-bold text-navy">{{ job_count }}</div>
+    <p class="mt-1 text-xs text-slate-400">Live jobs and internships from approved companies</p>
   </div>
-  <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+  <div class="cc-card p-5">
     <div class="text-sm text-slate-500">Approved companies</div>
     <div class="mt-1 text-3xl font-bold text-navy">{{ company_count }}</div>
+    <p class="mt-1 text-xs text-slate-400">Admin-reviewed before they can hire</p>
   </div>
-  <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+  <div class="cc-card p-5">
     <div class="text-sm text-slate-500">Skill courses</div>
     <div class="mt-1 text-3xl font-bold text-navy">Company-led</div>
+    <p class="mt-1 text-xs text-slate-400">Shown when a candidate is missing a required skill</p>
   </div>
 </div>
 
-<div class="mx-auto max-w-6xl px-4 py-12">
+<section class="cc-page">
+  <div class="mb-8 text-center">
+    <h2 class="text-2xl font-bold text-navy">How CareerConnect works</h2>
+    <p class="mt-2 text-sm text-slate-500">Three roles, one simple flow</p>
+  </div>
+  <div class="grid gap-4 md:grid-cols-3">
+    <article class="cc-card p-6">
+      <div class="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-sm font-bold text-brand">1</div>
+      <h3 class="font-bold text-navy">Build a profile</h3>
+      <p class="mt-2 text-sm leading-6 text-slate-500">Candidates add education, skills, and a resume. Companies register and wait for admin approval.</p>
+    </article>
+    <article class="cc-card p-6">
+      <div class="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-sm font-bold text-accent">2</div>
+      <h3 class="font-bold text-navy">Apply or hire</h3>
+      <p class="mt-2 text-sm leading-6 text-slate-500">Search jobs, apply in one click, and review applicants with resume access for the hiring team.</p>
+    </article>
+    <article class="cc-card p-6">
+      <div class="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-sm font-bold text-emerald-700">3</div>
+      <h3 class="font-bold text-navy">Close skill gaps</h3>
+      <p class="mt-2 text-sm leading-6 text-slate-500">If a skill is missing, the job page recommends a matching company course instead of just rejecting you.</p>
+    </article>
+  </div>
+</section>
+
+<div class="mx-auto max-w-6xl px-4 pb-6">
   <div class="mb-6 flex items-end justify-between gap-4">
     <div>
       <h2 class="text-xl font-bold text-navy">Latest openings</h2>
-      <p class="text-sm text-slate-500">Jobs and internships from approved companies</p>
+      <p class="text-sm text-slate-500">Fresh jobs and internships from approved companies</p>
     </div>
     <a class="text-sm font-semibold text-brand hover:underline" href="{{ url_for('jobs') }}">View all</a>
   </div>
+  {% if jobs %}
   <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
     {% for job in jobs %}
       {% include "partials/job_card.html" %}
-    {% else %}
-      <p class="text-slate-500">No jobs yet.</p>
     {% endfor %}
   </div>
+  {% else %}
+    <div class="cc-card px-6 py-12 text-center">
+      <p class="font-semibold text-navy">No openings yet</p>
+      <p class="mt-1 text-sm text-slate-500">Check back soon, or register as a company to post the first vacancy.</p>
+    </div>
+  {% endif %}
 </div>
 {% endblock %}

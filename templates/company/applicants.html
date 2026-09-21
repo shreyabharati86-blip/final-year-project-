@@ -1,11 +1,15 @@
 {% extends "base.html" %}
 {% block title %}Applicants{% endblock %}
 {% block content %}
-<div class="container py-4">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h4 mb-0">Applicants</h1>
-    <form class="d-flex gap-2" method="get">
-      <select class="form-select" name="job_id" onchange="this.form.submit()">
+<div class="cc-page">
+  <div class="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+    <div>
+      <h1 class="text-3xl font-extrabold tracking-tight text-navy">Applicants</h1>
+      <p class="mt-1 text-sm text-slate-500">Review resumes and update application status.</p>
+    </div>
+    <form method="get">
+      <label class="cc-label" for="job_id">Filter by job</label>
+      <select id="job_id" class="cc-input min-w-[220px]" name="job_id" onchange="this.form.submit()">
         <option value="">All jobs</option>
         {% for job in jobs %}
           <option value="{{ job.id }}" {% if selected_job == job.id %}selected{% endif %}>{{ job.title }}</option>
@@ -13,48 +17,68 @@
       </select>
     </form>
   </div>
-  <div class="panel p-0 overflow-hidden">
-    <table class="table mb-0 align-middle">
-      <thead>
-        <tr>
-          <th>Candidate</th>
-          <th>Job</th>
-          <th>Skills</th>
-          <th>Resume</th>
-          <th>Status</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for app in applications %}
-        <tr>
-          <td>{{ app.candidate.name }}<br><small class="text-muted">{{ app.candidate.email }}</small></td>
-          <td>{{ app.job.title }}</td>
-          <td class="small">{{ app.candidate.profile.skills if app.candidate.profile else "—" }}</td>
-          <td>
-            {% if app.candidate.profile and app.candidate.profile.resume_filename %}
-              <a href="{{ url_for('uploaded_resume', filename=app.candidate.profile.resume_filename) }}">Open</a>
-            {% else %}
-              —
-            {% endif %}
-          </td>
-          <td class="status-{{ app.status }}">{{ app.status|title }}</td>
-          <td class="text-nowrap">
-            <form class="d-inline" method="post" action="{{ url_for('update_application_status', app_id=app.id) }}">
-              <input type="hidden" name="status" value="accepted">
-              <button class="btn btn-sm btn-success">Accept</button>
-            </form>
-            <form class="d-inline" method="post" action="{{ url_for('update_application_status', app_id=app.id) }}">
-              <input type="hidden" name="status" value="rejected">
-              <button class="btn btn-sm btn-outline-danger">Reject</button>
-            </form>
-          </td>
-        </tr>
-        {% else %}
-        <tr><td colspan="6" class="p-4 text-muted">No applications yet.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  {% if applications %}
+  <div class="cc-card overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="cc-table w-full text-left text-sm">
+        <thead>
+          <tr>
+            <th>Candidate</th>
+            <th>Job</th>
+            <th>Skills</th>
+            <th>Resume</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for app in applications %}
+          <tr>
+            <td>
+              <div class="font-semibold text-navy">{{ app.candidate.name }}</div>
+              <div class="text-xs text-slate-500">{{ app.candidate.email }}</div>
+            </td>
+            <td>{{ app.job.title }}</td>
+            <td class="max-w-xs text-slate-600">{{ app.candidate.profile.skills if app.candidate.profile else "—" }}</td>
+            <td>
+              {% if app.candidate.profile and app.candidate.profile.resume_filename %}
+                <a class="font-semibold text-brand hover:underline" href="{{ url_for('uploaded_resume', filename=app.candidate.profile.resume_filename) }}">Open</a>
+              {% else %}
+                —
+              {% endif %}
+            </td>
+            <td>
+              {% if app.status == 'accepted' %}
+                <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">Accepted</span>
+              {% elif app.status == 'rejected' %}
+                <span class="rounded-full bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-700">Rejected</span>
+              {% else %}
+                <span class="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">Pending</span>
+              {% endif %}
+            </td>
+            <td class="whitespace-nowrap">
+              <div class="flex gap-2">
+                <form method="post" action="{{ url_for('update_application_status', app_id=app.id) }}">
+                  <input type="hidden" name="status" value="accepted">
+                  <button class="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700" type="submit">Accept</button>
+                </form>
+                <form method="post" action="{{ url_for('update_application_status', app_id=app.id) }}" data-confirm="Reject this application?">
+                  <input type="hidden" name="status" value="rejected">
+                  <button class="rounded-lg border border-rose-200 px-3 py-1.5 text-xs font-semibold text-rose-700 hover:bg-rose-50" type="submit">Reject</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
+  {% else %}
+  <div class="cc-card px-6 py-14 text-center">
+    <p class="text-lg font-bold text-navy">No applications yet</p>
+    <p class="mt-2 text-sm text-slate-500">Once candidates apply, their resume and skills will appear here.</p>
+  </div>
+  {% endif %}
 </div>
 {% endblock %}

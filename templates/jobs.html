@@ -1,30 +1,46 @@
 {% extends "base.html" %}
-{% block title %}Vacancies{% endblock %}
+{% block title %}{% if job_type == 'internship' %}Internships{% elif job_type == 'job' %}Jobs{% else %}Vacancies{% endif %}{% endblock %}
 {% block content %}
-<div class="container page-head">
-  <h1 class="h3">Vacancies</h1>
-  <p class="text-muted">Search jobs and internships</p>
-  <form class="row g-2 mb-4" method="get">
-    <div class="col-md-6">
-      <input class="form-control" name="q" value="{{ q }}" placeholder="Skill, title, company, city">
+<div class="cc-page">
+  <div class="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+    <div>
+      <h1 class="text-3xl font-extrabold tracking-tight text-navy">
+        {% if job_type == 'internship' %}Internships{% elif job_type == 'job' %}Jobs{% else %}All vacancies{% endif %}
+      </h1>
+      <p class="mt-1 text-sm text-slate-500">
+        {% if jobs %}{{ jobs|length }} opening{{ 's' if jobs|length != 1 }} found{% else %}No openings match this search{% endif %}
+      </p>
     </div>
-    <div class="col-md-3">
-      <select class="form-select" name="type">
-        <option value="" {% if not job_type %}selected{% endif %}>All</option>
+  </div>
+  <form class="cc-card mb-8 grid gap-3 p-4 md:grid-cols-12" method="get">
+    <div class="md:col-span-7">
+      <label class="cc-label" for="q">Search</label>
+      <input id="q" class="cc-input" name="q" value="{{ q }}" placeholder="Skill, title, company, city">
+    </div>
+    <div class="md:col-span-3">
+      <label class="cc-label" for="type">Type</label>
+      <select id="type" class="cc-input" name="type">
+        <option value="" {% if not job_type %}selected{% endif %}>All openings</option>
         <option value="job" {% if job_type == 'job' %}selected{% endif %}>Jobs</option>
         <option value="internship" {% if job_type == 'internship' %}selected{% endif %}>Internships</option>
       </select>
     </div>
-    <div class="col-md-3">
-      <button class="btn btn-navy w-100" type="submit">Filter</button>
+    <div class="flex items-end md:col-span-2">
+      <button class="cc-btn-dark w-full" type="submit">Filter</button>
     </div>
   </form>
-  <div class="row g-3">
+  {% if jobs %}
+  <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
     {% for job in jobs %}
       {% include "partials/job_card.html" %}
-    {% else %}
-      <p class="text-muted">No vacancies match that search.</p>
     {% endfor %}
   </div>
+  {% else %}
+  <div class="cc-card px-6 py-14 text-center">
+    <p class="text-lg font-bold text-navy">No vacancies match that search</p>
+    <p class="mt-2 text-sm text-slate-500">Try a broader keyword, or clear the filters to see every opening.</p>
+    <a class="cc-btn-primary mt-5" href="{{ url_for('jobs') }}">Clear filters</a>
+  </div>
+  {% endif %}
 </div>
 {% endblock %}
