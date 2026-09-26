@@ -789,9 +789,15 @@ def get_application_trend(
         ORDER BY day
     """ % _where(clauses)
     daily = _label_rows(sql, params)
-    empty = {"granularity": "month", "labels": [], "counts": []}
+    empty_series = {"labels": [], "counts": []}
     if not daily:
-        return empty
+        return {
+            "granularity": "month",
+            "labels": [],
+            "counts": [],
+            "daily": empty_series,
+            "monthly": empty_series,
+        }
 
     span_days = 0
     try:
@@ -801,26 +807,31 @@ def get_application_trend(
     except ValueError:
         span_days = len(daily)
 
-    if len(daily) <= 45 and span_days <= 60:
-        labels = []
-        counts = []
-        for item in daily:
-            parsed = parse_dt(item["label"])
-            labels.append(parsed.strftime("%d %b") if parsed else item["label"])
-            counts.append(item["count"])
-        return {"granularity": "day", "labels": labels, "counts": counts}
-
+    daily_labels = []
+    daily_counts = []
     months = {}
     for item in daily:
+        parsed = parse_dt(item["label"])
+        daily_labels.append(parsed.strftime("%d %b") if parsed else item["label"])
+        daily_counts.append(item["count"])
         key = item["label"][:7]
         months[key] = months.get(key, 0) + item["count"]
-    labels = []
-    counts = []
+
+    monthly_labels = []
+    monthly_counts = []
     for key in sorted(months):
         parsed = parse_dt(key + "-01")
-        labels.append(parsed.strftime("%b %Y") if parsed else key)
-        counts.append(months[key])
-    return {"granularity": "month", "labels": labels, "counts": counts}
+        monthly_labels.append(parsed.strftime("%b %Y") if parsed else key)
+        monthly_counts.append(months[key])
+
+    use_daily = len(daily) <= 45 and span_days <= 60
+    return {
+        "granularity": "day" if use_daily else "month",
+        "labels": daily_labels if use_daily else monthly_labels,
+        "counts": daily_counts if use_daily else monthly_counts,
+        "daily": {"labels": daily_labels, "counts": daily_counts},
+        "monthly": {"labels": monthly_labels, "counts": monthly_counts},
+    }
 
 
 def get_job_statistics(company_id=None, job_type=None):
